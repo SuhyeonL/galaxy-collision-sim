@@ -38,12 +38,26 @@ vz_B = np.zeros(N)
 # mass
 m_B = np.ones(N)
 
+### 데이터 구조화
+gal_A = np.column_stack((x_A, y_A, z_A, vx_A, vy_A, vz_A, m_A))
+gal_B = np.column_stack((x_B, y_B, z_B, vx_B, vy_B, vz_B, m_B))
+
+# [0 ~ 999]     -> A
+# [1000 ~ 1999] -> B
+total_gal = np.vstack((gal_A, gal_B))
+
+# .bin 파일 생성
+N *= 2
+data = np.concatenate((np.array([N], dtype=np.float32), total_gal.flatten().astype(np.float32)))
+data.tofile("gal_data.bin")
+
+
 
 ### 2D data vizualization
-#plt.scatter(x_A, z_A, s=0.5, c='blue', label='Galaxy A')
-#plt.scatter(x_B, z_B, s=0.5, c='red', label='Galaxy B')
-#plt.legend()
-#plt.show()
+# plt.scatter(x_A, z_A, s=0.5, c='blue', label='Galaxy A')
+# plt.scatter(x_B, z_B, s=0.5, c='red', label='Galaxy B')
+# plt.legend()
+# plt.show()
 ### 
 
 ### 3D data vizualization
@@ -59,15 +73,3 @@ m_B = np.ones(N)
 # ax.legend()
 # plt.show()
 ###
-
-### 데이터 구조화
-gal_A = np.column_stack((x_A, y_A, z_A, vx_A, vy_A, vz_A, m_A))
-gal_B = np.column_stack((x_B, y_B, z_B, vx_B, vy_B, vz_B, m_B))
-
-# [0 ~ 999]     -> A
-# [1000 ~ 1999] -> B
-total_gal = np.vstack((gal_A, gal_B))
-
-# .bin 파일 생성
-data = np.concatenate((np.array([N]), total_gal.flatten()))
-data.tofile("gal_data.bin")
