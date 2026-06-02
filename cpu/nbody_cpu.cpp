@@ -17,9 +17,9 @@
 // Epsilon: softening parameter
 #define EPSILON 0.1f
 // 시뮬레이션에서 한 스텝당 흐른 시간
-#define DT 0.001f
+#define DT 0.005f
 // 계산 step
-#define STEPS 100
+#define STEPS 1000
 
 
 int main() {
@@ -31,8 +31,8 @@ int main() {
     }
 
     // 1.2 N 읽기
-    float N;
-    fread(&N, sizeof(float), 1, fp);
+    int N;
+    fread(&N, sizeof(int), 1, fp);
     // N check
     // std::cout << N << '\n';
 

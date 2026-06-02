@@ -15,7 +15,7 @@ N = 1000
 
 ### galaxy A
 # loc
-x_A = np.random.normal(loc=10.0, scale=1.5, size=N)
+x_A = np.random.normal(loc=5.0, scale=1.5, size=N)
 y_A = np.random.normal(loc=0.0, scale=0.15, size=N)
 z_A = np.random.normal(loc=0.0, scale=1.5, size=N)
 # velocity
@@ -28,7 +28,7 @@ m_A = np.ones(N)
 
 ### galaxy B
 # loc
-x_B = np.random.normal(loc=-10.0, scale=1.5, size=N)
+x_B = np.random.normal(loc=-5.0, scale=1.5, size=N)
 y_B = np.random.normal(loc=0.0, scale=0.15, size=N)
 z_B = np.random.normal(loc=0.0, scale=1.5, size=N)
 # velocity
@@ -48,7 +48,7 @@ total_gal = np.vstack((gal_A, gal_B))
 
 # .bin 파일 생성
 N *= 2
-data = np.concatenate((np.array([N], dtype=np.float32), total_gal.flatten().astype(np.float32)))
+data = np.concatenate((np.array([N], dtype=np.int32).view(np.float32), total_gal.flatten().astype(np.float32)))
 data.tofile("gal_data.bin")
 
 

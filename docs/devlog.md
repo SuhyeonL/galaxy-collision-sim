@@ -23,5 +23,14 @@
 - 매 스텝 마다 위치 저장
 - 저장 한 위치 viz_data.bin 파일에 저장
 
+- viz_data.bin 파일 데이터로 2차원 시각화 애니메이션 구현
+
+### 문제
+- generate_data.py에서 은하 데이터 생성해서 c++로 옮기는 과정에서 입자 개수 N을 int로 저장하지 않고 float으로 저장하고 옮겨와 viz.py에서 N을 int로 읽어들이지 못 했음
+- 2차원으로 시각화해서 애니메이션이 이상함
+
+### 해결
+- generate_data.py에서 N을 int로 저장하고 nbody_cpu.cpp도 int로 N을 읽게끔 수정함
+
 ### 다음에 할 것
 - viz_data.bin파일의 데이터를 이용해 python으로 시각화 하기
