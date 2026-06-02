@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <cmath>
 #include <chrono>
+#include <vector>
 
 // 중력 상수 G
 #define G 1.0f
@@ -54,6 +55,10 @@ int main() {
     float* ax_arr = new float[N];
     float* ay_arr = new float[N];
     float* az_arr = new float[N];
+
+    // Python 시각화 용 위치 데이터 저장 배열
+    std::vector<std::vector<float>> viz_data(STEPS, std::vector<float>(3*N));
+
     
     auto st = std::chrono::high_resolution_clock::now();
 
@@ -99,6 +104,12 @@ int main() {
             data[i*7 + 1] += data[i*7 + 4]*DT;
             data[i*7 + 2] += data[i*7 + 5]*DT;
         }
+        // 매 step 마다 위치 데이터 저장
+        for(int i = 0; i < N; i++) {
+            viz_data[step][i*3 + 0] = data[i*7 + 0];
+            viz_data[step][i*3 + 1] = data[i*7 + 1];
+            viz_data[step][i*3 + 2] = data[i*7 + 2];
+        }
     }
 
     auto ed = std::chrono::high_resolution_clock::now();
@@ -108,6 +119,28 @@ int main() {
     std::cout << data[0] << ' ' << data[1] << ' ' << data[2] << '\n';
 
     std::cout << "실행 시간: " << elapsed << '\n';
+
+    /* viz_data 체크
+    for(int i = 0; i < 3; i++) {
+        printf("%f %f %f \n", viz_data[0][i*3+0], viz_data[0][i*3+1], viz_data[0][i*3+2]);
+    }
+    */
+
+    // Python 시각화 용 .bin 파일
+    // viz_data를 .bin 파일로 저장
+    FILE* out = fopen("viz_data.bin", "wb");
+    
+    // header: STEPS, N 저장
+    int steps = STEPS;
+    fwrite(&steps, sizeof(int), 1, out);
+    fwrite(&N, sizeof(int), 1, out);
+
+    // 위치 데이터 저장
+    for(int step = 0; step < STEPS; step++) {
+        fwrite(viz_data[step].data(), sizeof(float), N*3, out);
+    }
+
+    fclose(out);
 
 
     delete [] ax_arr;
