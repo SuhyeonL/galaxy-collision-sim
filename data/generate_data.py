@@ -15,7 +15,7 @@ N = 1000
 
 ### galaxy A
 # loc
-x_A = np.random.normal(loc=5.0, scale=1.5, size=N)
+x_A = np.random.normal(loc=10.0, scale=1.5, size=N)
 y_A = np.random.normal(loc=0.0, scale=0.15, size=N)
 z_A = np.random.normal(loc=0.0, scale=1.5, size=N)
 # velocity
@@ -28,7 +28,7 @@ m_A = np.ones(N)
 
 ### galaxy B
 # loc
-x_B = np.random.normal(loc=-5.0, scale=1.5, size=N)
+x_B = np.random.normal(loc=-10.0, scale=1.5, size=N)
 y_B = np.random.normal(loc=0.0, scale=0.15, size=N)
 z_B = np.random.normal(loc=0.0, scale=1.5, size=N)
 # velocity
