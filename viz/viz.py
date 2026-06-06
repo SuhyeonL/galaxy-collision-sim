@@ -67,7 +67,7 @@ ax2d = fig.add_subplot(122)
 ax2d.set_facecolor("black")
 ax2d.set_xlabel("X", color="gray")
 ax2d.set_ylabel("Z (depth)", color="gray")
-ax2d.set_title("입자 밀도 히트맵 (XZ 평면)", color="white", fontsize=11)
+ax2d.set_title("Particle Density Heatmap (XZ Plane)", color="white", fontsize=11)
 ax2d.tick_params(colors="gray")
 
 # 히트맵 초기 렌더링
@@ -83,7 +83,7 @@ im = ax2d.imshow(
 )
 cbar = fig.colorbar(im, ax=ax2d, fraction=0.046, pad=0.04)
 cbar.ax.yaxis.set_tick_params(color="gray")
-cbar.set_label("입자 수 (밀도)", color="gray", fontsize=9)
+cbar.set_label("Particle Count (Density)", color="gray", fontsize=9)
 
 step_label_2d = ax2d.text(0.02, 0.96, "", transform=ax2d.transAxes,
                            color="white", fontsize=9, verticalalignment="top")
