@@ -2,14 +2,19 @@
 # 은하 충돌 시뮬레이션 시각화
 #
 # 실행 방법: viz/ 디렉터리에서
-#   python viz.py
+#   python viz.py            <- GIF 저장 (서버/헤드리스 환경)
+#   python viz.py --show     <- 창으로 띄우기 (로컬 GUI 환경)
 #
 # 구성:
 #   - 왼쪽: 3D scatter 애니메이션 (은하 A/B 궤적)
 #   - 오른쪽: XZ 평면 입자 밀도 히트맵 (충돌 에너지 분포 분석)
 
 import os
+import sys
 import numpy as np
+import matplotlib
+if "--show" not in sys.argv:
+    matplotlib.use("Agg")   # 서버(헤드리스) 환경 — GUI 없이 GIF 저장
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from matplotlib.animation import FuncAnimation
@@ -132,4 +137,17 @@ ani = FuncAnimation(
 )
 
 plt.tight_layout()
-plt.show()
+
+if "--show" in sys.argv:
+    plt.show()
+else:
+    # 서버 환경: GIF로 저장 (Pillow 사용, ffmpeg 불필요)
+    SAVE_FRAMES = min(200, STEPS)
+    frame_step  = max(1, STEPS // SAVE_FRAMES)
+    save_frames = list(range(0, STEPS, frame_step))[:SAVE_FRAMES]
+
+    print(f"Saving GIF... ({len(save_frames)} frames, please wait)")
+    ani_save = FuncAnimation(fig, update, frames=save_frames, interval=40, blit=False)
+    out_path = "galaxy_collision.gif"
+    ani_save.save(out_path, writer="pillow", fps=25, dpi=80)
+    print(f"Saved: viz/{out_path}")
