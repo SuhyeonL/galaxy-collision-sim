@@ -12,8 +12,10 @@
 import subprocess
 import os
 import re
-import struct
+import csv
 import numpy as np
+import matplotlib
+matplotlib.use("Agg")   # 서버(헤드리스) 환경 — 화면 없이 PNG 저장
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 
@@ -92,12 +94,14 @@ def main():
         generate_data(n)
 
         print("  [CPU] 실행 중...")
-        cpu_res = run_and_parse(os.path.abspath(CPU_BIN), ".")
+        # cwd를 cpu/ 로 설정 → 바이너리 내부 fopen("../data/gal_data.bin") 경로 정상 동작
+        cpu_res = run_and_parse(os.path.abspath(CPU_BIN), "./cpu")
         cpu_t = cpu_res["elapsed"]
         print(f"  [CPU] 시간: {cpu_t:.3f}s" if cpu_t else "  [CPU] 실패")
 
         print("  [GPU] 실행 중...")
-        gpu_res = run_and_parse(os.path.abspath(GPU_BIN), ".")
+        # cwd를 gpu/ 로 설정 → 바이너리 내부 fopen("../data/gal_data.bin") 경로 정상 동작
+        gpu_res = run_and_parse(os.path.abspath(GPU_BIN), "./gpu")
         gpu_t  = gpu_res["elapsed"]
         gpu_gf = gpu_res["gflops"]
         print(f"  [GPU] 시간: {gpu_t:.3f}s  성능: {gpu_gf:.2f} GFLOPS" if gpu_t else "  [GPU] 실패")
@@ -120,7 +124,6 @@ def main():
         gpu_gflops.append(gpu_gf)
 
     # ── 결과 저장 (CSV) ───────────────────────────
-    import csv
     with open("benchmark/results.csv", "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow(["N", "cpu_time_s", "gpu_time_s", "speedup", "cpu_gflops", "gpu_gflops"])
@@ -147,43 +150,43 @@ def plot_results(ns, cpu_times, gpu_times, cpu_gflops, gpu_gflops):
     speedups = [c / g for c, g in zip(ct_v, gt_v)]
 
     fig, axes = plt.subplots(1, 3, figsize=(16, 5))
-    fig.suptitle("CPU vs GPU N-Body 성능 비교", fontsize=15, fontweight="bold")
+    fig.suptitle("CPU vs GPU N-Body Performance Comparison", fontsize=15, fontweight="bold")
 
-    # ── 그래프 1: 실행 시간 ──
+    # ── Graph 1: Execution Time ──
     ax = axes[0]
     ax.plot(ns_v, ct_v, "o-", color="#e74c3c", linewidth=2, markersize=6, label="CPU")
     ax.plot(ns_v, gt_v, "s-", color="#3498db", linewidth=2, markersize=6, label="GPU (Tiling + SoA)")
-    ax.set_xlabel("입자 수 N")
-    ax.set_ylabel("실행 시간 (s)")
-    ax.set_title("실행 시간 비교")
+    ax.set_xlabel("Number of Particles (N)")
+    ax.set_ylabel("Execution Time (s)")
+    ax.set_title("Execution Time Comparison")
     ax.set_xscale("log", base=2)
     ax.set_yscale("log")
     ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{int(x):,}"))
     ax.legend()
     ax.grid(True, alpha=0.3)
 
-    # ── 그래프 2: 속도 향상 배율 ──
+    # ── Graph 2: Speedup ──
     ax = axes[1]
-    ax.plot(ns_v, speedups, "D-", color="#2ecc71", linewidth=2, markersize=6)
-    ax.axhline(y=50, color="gray", linestyle="--", alpha=0.5, label="목표: 50x")
-    ax.set_xlabel("입자 수 N")
-    ax.set_ylabel("속도 향상 (CPU 시간 / GPU 시간)")
-    ax.set_title("GPU 속도 향상 배율")
+    ax.plot(ns_v, speedups, "D-", color="#2ecc71", linewidth=2, markersize=6, label="Speedup")
+    ax.axhline(y=50, color="gray", linestyle="--", alpha=0.5, label="Target: 50x")
+    ax.set_xlabel("Number of Particles (N)")
+    ax.set_ylabel("Speedup (CPU Time / GPU Time)")
+    ax.set_title("GPU Speedup over CPU")
     ax.set_xscale("log", base=2)
     ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{int(x):,}"))
     ax.legend()
     ax.grid(True, alpha=0.3)
 
-    # ── 그래프 3: GFLOPS ──
+    # ── Graph 3: GFLOPS ──
     ax = axes[2]
     if any(cg_v):
         ax.plot(ns_v, cg_v, "o-", color="#e74c3c", linewidth=2, markersize=6, label="CPU")
     if any(gg_v):
         ax.plot(ns_v, [g for g in gg_v], "s-", color="#3498db", linewidth=2, markersize=6,
                 label="GPU (Tiling + SoA)")
-    ax.set_xlabel("입자 수 N")
+    ax.set_xlabel("Number of Particles (N)")
     ax.set_ylabel("GFLOPS")
-    ax.set_title("연산 처리량 (GFLOPS)")
+    ax.set_title("Throughput (GFLOPS)")
     ax.set_xscale("log", base=2)
     ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{int(x):,}"))
     ax.legend()
@@ -192,8 +195,7 @@ def plot_results(ns, cpu_times, gpu_times, cpu_gflops, gpu_gflops):
     plt.tight_layout()
     out_path = "benchmark/performance_comparison.png"
     plt.savefig(out_path, dpi=150, bbox_inches="tight")
-    print(f"그래프 저장: {out_path}")
-    plt.show()
+    print(f"Graph saved: {out_path}")
 
 
 if __name__ == "__main__":
